@@ -88,7 +88,7 @@ This project was developed by a team of five students:
 | **Youssef Khaled** | Developed the `TaskList` class, including sorting and file handling.  |
 | **Nour Gamal** | Built the menu system in `ToDoListApp` for user interaction.              |
 | **Nada Hassan** | Implemented methods for adding, removing, and listing tasks.             |
-| **Loren ** | Added the search feature and integrated it into the app.                      |
+| **Loren** | Added the search feature and integrated it into the app.                      |
 
 ---
 
