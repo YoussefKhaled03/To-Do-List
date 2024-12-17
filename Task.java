@@ -21,6 +21,16 @@ public Task(String title, String description, boolean Completion_status, LocalDa
         }
 }
 
+public String getTitle(){
+    return title;
+}
+public String getPriority(){
+    return priority;
+}
+public LocalDate getDueDate(){
+    return dueDate;
+}
+    
     @Override
     public String toString() {
         return "Task{" +
