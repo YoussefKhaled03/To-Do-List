@@ -1,3 +1,7 @@
+import java.util.Arrays;
+import java.util.Comparator;
+
+
 public class TaskList {
     private Task[] tasks;
     private int size;
@@ -44,5 +48,20 @@ public class TaskList {
     public void sortTasks(Comparator<Task> comparator) {
         Arrays.sort(tasks, 0, size, comparator);
     }
+
+     public Task[] searchTasks(String keyword) {
+    Task[] matchingTasks = new Task[size];  
+    int count = 0;  
+
+    for (int i = 0; i < size; i++) {
+       if (tasks[i] != null && (tasks[i].getTitle().equals(keyword.trim()) || 
+                         tasks[i].getPriority().equals(keyword.trim()) || 
+                         tasks[i].getDueDate().toString().equals(keyword.trim()))) {
+            matchingTasks[count++] = tasks[i];  
+        }
+    }
+
+    return matchingTasks;  
+}
     
 }
