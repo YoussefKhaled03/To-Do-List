@@ -44,6 +44,9 @@ public class TaskList {
     public void updateTask(int index, Task task) {
         tasks[index] = task;
     }
+     public int getSize() {
+        return size;
+    }
 
     public void sortTasks(Comparator<Task> comparator) {
         Arrays.sort(tasks, 0, size, comparator);
