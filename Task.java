@@ -30,6 +30,13 @@ public String getPriority(){
 public LocalDate getDueDate(){
     return dueDate;
 }
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isCompleted() {
+        return Completion_status; 
+    }
     
     @Override
     public String toString() {
