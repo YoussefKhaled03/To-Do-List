@@ -1,7 +1,6 @@
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.time.LocalDate;
+//import java.util.ArrayList;
+//import java.util.List;
 import java.util.Scanner;
 
 public class ToDoListApp {
@@ -23,7 +22,7 @@ public class ToDoListApp {
 
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1 -> addTask();
@@ -41,81 +40,117 @@ public class ToDoListApp {
             }
         }
     }
-
-    // Add user
-    public static void addUser(User user) {
-        String query = "INSERT INTO users (username, password) VALUES (?, ?)";
-
-        try (Connection conn = DatabaseConnection.connect();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setString(1, user.getUsername());
-            pstmt.setString(2, user.getPassword());
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
+    //add method
     private void addTask() {
-        scanner.nextLine(); // Consume newline
+        //title
         System.out.print("Enter task title: ");
         String title = scanner.nextLine().trim();
-
+        if (title.isEmpty()) {
+            System.out.println("Task title cannot be empty. Please try again.");
+            return;
+        }
+        //description
         System.out.print("Enter task description: ");
         String description = scanner.nextLine().trim();
 
-        // Validate due date
-        LocalDate dueDate = null;
-        boolean validDate = false;
-        while (!validDate) {
-            System.out.print("Enter due date (YYYY-MM-DD): ");
-            String dueDateInput = scanner.nextLine().trim();
+        LocalDate dueDate;
+        while (true) {
             try {
-                dueDate = LocalDate.parse(dueDateInput);
-                validDate = true;
+                // year
+                System.out.print("Enter year (YYYY): ");
+                int year = Integer.parseInt(scanner.nextLine().trim());
+
+                //month
+                System.out.print("Enter month (1-12): ");
+                int month = Integer.parseInt(scanner.nextLine().trim());
+                if (month < 1 || month > 12) {
+                    System.out.println("Invalid month. Please try again.");
+                    continue;
+                }
+
+                //day
+                System.out.print("Enter day (1-31): ");
+                int day = Integer.parseInt(scanner.nextLine().trim());
+                if (day < 1 || day > 31) {
+                    System.out.println("Invalid day. Please try again.");
+                    continue;
+                }
+
+                //comparing the due date with the current date
+                dueDate = LocalDate.of(year, month, day);
+
+                if (!dueDate.isBefore(LocalDate.now())) {
+                    break;
+                } else {
+                    System.out.println("Due date cannot be in the past. Please try again.");
+                }
             } catch (Exception e) {
-                System.out.println("Invalid date format. Please use the format YYYY-MM-DD.");
+                System.out.println("Invalid input. Please try again.");
             }
         }
 
-        // Validate priority
-        String priority = null;
-        boolean validPriority = false;
-        while (!validPriority) {
-            System.out.print("Enter priority (LOW, MEDIUM, HIGH): ");
-            priority = scanner.nextLine().trim().toUpperCase();
-            if (priority.equals("LOW") || priority.equals("MEDIUM") || priority.equals("HIGH")) {
-                validPriority = true;
+        //priority
+        String priority;
+        while (true) {
+            System.out.print("Enter priority\n1. LOW\n2. MEDIUM\n3.HIGH): ");
+            String input = scanner.nextLine().trim();
+            
+            if (input.equals("1")) {
+                priority = "LOW";
+                break;
+            } else if (input.equals("2")) {
+                priority = "MEDIUM";
+                break;
+            } else if (input.equals("3")) {
+                priority = "HIGH";
+                break;
             } else {
-                System.out.println("Invalid priority. Please enter LOW, MEDIUM, or HIGH.");
+                System.out.println("Invalid input. Please enter 1 for LOW, 2 for MEDIUM, or 3 for HIGH.");
             }
         }
-
-        taskList.addTask(new Task(title, description, false, dueDate, priority));
-        System.out.println("Task added successfully!");
+        //creating a new task
+        Task newTask = new Task(title, description, false, dueDate, priority);
+        taskList.addTask(newTask);
+        System.out.println("Task added successfully.");
     }
 
+    //remove method
     private void removeTask() {
-        listTasks();
+        if (taskList.getSize() == 0) {
+            System.out.println("No tasks to remove.");
+            return;
+        }
+        listTasks(); // Display the list of tasks
         System.out.print("Enter the number of the task to remove: ");
-        int index = scanner.nextInt() - 1;
-
+        int index;
+        try {
+            index = Integer.parseInt(scanner.nextLine()) - 1; // Convert input to zero-based index
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+            return;
+        }
+    
         if (index >= 0 && index < taskList.getSize()) {
-            taskList.removeTask(index);
+            taskList.removeTask(index); 
             System.out.println("Task removed successfully!");
+            listTasks();
         } else {
-            System.out.println("Invalid task number.");
+            System.out.println("Invalid task number. Please choose a valid number from the list.");
         }
     }
 
+    //list method
     private void listTasks() {
         System.out.println("\n--- Task List ---");
         if (taskList.getSize() == 0) {
             System.out.println("No tasks available.");
         } else {
             taskList.listTasks();
+            System.out.printf("%-20s %-30s %-15s %-15s %-10s%n", "Task Name", "Description", "Status", "Due Date", "Priority");
+            System.out.println("--------------------------------------------------------------------------------------------------");
         }
     }
+    
 
     private void searchTasks() {
         System.out.print("Enter keyword to search (title, priority, or due date): ");
@@ -124,9 +159,16 @@ public class ToDoListApp {
         Task[] matchingTasks = taskList.searchTasks(keyword);
         if (matchingTasks.length > 0) {
             System.out.println("\n--- Search Results ---");
+            System.out.printf("%-20s %-30s %-15s %-15s %-10s%n","Task Name", "Description", "Status", "Due Date", "Priority");
+            System.out.println("--------------------------------------------------------------------------------------------------");
             for (Task task : matchingTasks) {
-                if (task != null) {
-                    System.out.println(task);
+                if (task != null) { 
+                    System.out.printf("%-20s %-30s %-15s %-15s %-10s%n", 
+                                      task.getTitle(), 
+                                      task.getDescription(), 
+                                      task.isCompleted() ? "Completed" : "Pending",
+                                      task.getDueDate() != null ? task.getDueDate().toString() : "No due date",
+                                      task.getPriority());
                 }
             }
         } else {
@@ -164,4 +206,3 @@ public class ToDoListApp {
         app.start();
     }
 }
-

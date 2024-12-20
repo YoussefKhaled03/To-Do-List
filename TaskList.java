@@ -11,13 +11,22 @@ public class TaskList {
         size = 0;
     }
 
+    //list method
     public void listTasks() {
-        for (int i = 0; i < size; i++) {
-            System.out.println(i + 1 + ". " + tasks[i]);
+        // List tasks
+        for (Task task : tasks) {
+            if (task != null) { // Ensure task is not null
+                System.out.printf("%-20s %-30s %-15s %-15s %-10s%n", 
+                                  task.getTitle(), 
+                                  task.getDescription(), 
+                                  task.isCompleted() ? "Completed" : "Pending",
+                                  task.getDueDate() != null ? task.getDueDate().toString() : "No due date",
+                                  task.getPriority());
+            }
         }
-    }
+    }  
     
-
+    //add method
     public void addTask(Task task) {
         if (size == tasks.length) {
             Task[] newTasks = new Task[size * 2];
@@ -33,11 +42,16 @@ public class TaskList {
     public Task getTask(int index) {
         return tasks[index];
     }
-
+    //remove method
     public void removeTask(int index) {
+        if (index < 0 || index >= size) {
+            System.out.println("Invalid index. Please provide a valid task index.");
+            return;
+        }
         for (int i = index; i < size - 1; i++) {
             tasks[i] = tasks[i + 1];
         }
+        tasks[size - 1] = null;
         size--;
     }
 
@@ -52,7 +66,7 @@ public class TaskList {
         Arrays.sort(tasks, 0, size, comparator);
     }
 
-     public Task[] searchTasks(String keyword) {
+    public Task[] searchTasks(String keyword) {
     Task[] matchingTasks = new Task[size];  
     int count = 0;  
 
@@ -65,6 +79,6 @@ public class TaskList {
     }
 
     return matchingTasks;  
-}
+    }
     
 }
