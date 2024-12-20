@@ -145,9 +145,10 @@ public class ToDoListApp {
         if (taskList.getSize() == 0) {
             System.out.println("No tasks available.");
         } else {
-            taskList.listTasks();
             System.out.printf("%-20s %-30s %-15s %-15s %-10s%n", "Task Name", "Description", "Status", "Due Date", "Priority");
             System.out.println("--------------------------------------------------------------------------------------------------");
+            taskList.listTasks();
+
         }
     }
     
