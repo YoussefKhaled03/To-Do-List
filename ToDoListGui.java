@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.time.LocalDate;
 
-public class ToDoListGUI {
+public class ToDoListGui {
     private TaskList taskList = new TaskList(); // Core Logic
 
     // Swing Components
@@ -12,7 +12,7 @@ public class ToDoListGUI {
     private DefaultListModel<Task> listModel;
     private JList<Task> taskJList;
 
-    public ToDoListGUI() {
+    public ToDoListGui() {
         initializeGUI();
     }
 
@@ -172,6 +172,6 @@ public class ToDoListGUI {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(ToDoListGUI::new);
+        SwingUtilities.invokeLater(ToDoListGui::new);
     }
 }
