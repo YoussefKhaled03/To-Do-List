@@ -1,3 +1,6 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Scanner;
 
@@ -36,6 +39,20 @@ public class ToDoListApp {
                 }
                 default -> System.out.println("Invalid choice. Please try again.");
             }
+        }
+    }
+
+    // Add user
+    public static void addUser(User user) {
+        String query = "INSERT INTO users (username, password) VALUES (?, ?)";
+
+        try (Connection conn = DatabaseConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, user.getUsername());
+            pstmt.setString(2, user.getPassword());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
