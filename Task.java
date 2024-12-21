@@ -36,6 +36,16 @@ public LocalDate getDueDate(){
     public boolean isCompleted() {
         return Completion_status; 
     }
+    public static boolean isDate(String in) {
+    return in.matches("\\d{4}-\\d{2}-\\d{2}");
+}
+public static String isPriority(String priority) {
+        if (priority.matches("LOW|MEDIUM|HIGH")) {
+            return "Valid priority";
+        } else {
+            return "Not Valid priority";
+        }
+    }
     
     @Override
     public String toString() {
