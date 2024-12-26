@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.util.Arrays;
+public class main {
  public static String isValidDate(String dateStr) {
     // Check if dateStr is null or empty
     if (dateStr == null || dateStr.isEmpty()) {
@@ -11,7 +12,7 @@ import java.util.Arrays;
         return "Not valid date";
     }
 }
-public class main {
+
     public static void main(String[] args) {
         TaskList x = new TaskList();
    String dateStr = "2024-12-18";
