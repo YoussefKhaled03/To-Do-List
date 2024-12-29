@@ -85,10 +85,17 @@ public class ToDoListApp {
         LocalDate dueDate = getValidDueDate();
         String priority;
         while (true) {
-            System.out.print("Enter task priority (LOW, MEDIUM, HIGH): ");
-            priority = scanner.nextLine().trim().toUpperCase();
-            if (priority.matches("LOW|MEDIUM|HIGH")) {
-            break;
+            System.out.print("Enter priority\n1. LOW\n2. MEDIUM\n3.HIGH): ");
+            String input = scanner.nextLine().trim();
+            if (input.equals("1")) {
+                priority = "LOW";
+                break;
+            } else if (input.equals("2")) {
+                priority = "MEDIUM";
+                break;
+            } else if (input.equals("3")) {
+                priority = "HIGH";
+                break;
             } else {
             System.out.println("\u001B[31mInvalid priority. Please choose from LOW, MEDIUM, or HIGH.\u001B[0m"); // Red color for invalid priority
             }
@@ -109,19 +116,38 @@ public class ToDoListApp {
 
     private LocalDate getValidDueDate() {
         while (true) {
-            System.out.print("Enter due date (YYYY-MM-DD): ");
             try {
-                LocalDate date = LocalDate.parse(scanner.nextLine().trim());
-                if (date.isBefore(LocalDate.now())) {
-                    System.out.println("\u001B[31mDue date cannot be in the past. Try again.\u001B[0m"); // Red color for past date
-                } else {
-                    return date;
+                System.out.print("Enter year (YYYY): ");
+                int year = Integer.parseInt(scanner.nextLine().trim());
+    
+                System.out.print("Enter month (1-12): ");
+                int month = Integer.parseInt(scanner.nextLine().trim());
+                if (month < 1 || month > 12) {
+                    System.out.println("\u001B[31mInvalid month. Please try again.\u001B[0m"); // Red for invalid month
+                    continue;
                 }
+    
+                System.out.print("Enter day (1-31): ");
+                int day = Integer.parseInt(scanner.nextLine().trim());
+                if (day < 1 || day > 31) {
+                    System.out.println("\u001B[31mInvalid day. Please try again.\u001B[0m"); // Red for invalid day
+                    continue;
+                }
+    
+                LocalDate dueDate = LocalDate.of(year, month, day);
+                if (dueDate.isBefore(LocalDate.now())) {
+                    System.out.println("\u001B[31mDue date cannot be in the past. Try again.\u001B[0m"); // Red for past date
+                } else {
+                    return dueDate;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("\u001B[31mInvalid number format. Try again.\u001B[0m"); // Red for invalid number
             } catch (Exception e) {
-                System.out.println("\u001B[31mInvalid date format. Try again.\u001B[0m"); // Red color for invalid format
+                System.out.println("\u001B[31mInvalid date. Please try again.\u001B[0m"); // Red for general error
             }
         }
     }
+    
 
     private void removeTask() {
         listTasks();
@@ -219,6 +245,7 @@ public class ToDoListApp {
         }
     }
     System.out.println("\n\u001B[32mTask marked as completed successfully!\u001B[0m"); // Green color for success message
+    listTasks();
     }
 
     private void exitApp() {
