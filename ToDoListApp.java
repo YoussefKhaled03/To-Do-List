@@ -85,7 +85,7 @@ public class ToDoListApp {
         LocalDate dueDate = getValidDueDate();
         String priority;
         while (true) {
-            System.out.print("Enter priority\n1. LOW\n2. MEDIUM\n3.HIGH): ");
+            System.out.print("Enter priority\n1. LOW\n2. MEDIUM\n3.HIGH\n : ");
             String input = scanner.nextLine().trim();
             if (input.equals("1")) {
                 priority = "LOW";
@@ -212,7 +212,18 @@ public class ToDoListApp {
     }
 
     private void sortTasksByPriority() {
-        taskList.sort(Comparator.comparing(Task::getPriority));
+        taskList.sort(Comparator.comparingInt(task -> {
+            switch (task.getPriority().toLowerCase()) {
+                case "high":
+                    return 1;
+                case "medium":
+                    return 2;
+                case "low":
+                    return 3;
+                default:
+                    return 4; // For any undefined priority
+            }
+        }));
         System.out.println("Tasks sorted by priority.");
     }
 
