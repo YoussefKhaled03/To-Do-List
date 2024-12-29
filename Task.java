@@ -29,15 +29,18 @@ public String getPriority(){
 public LocalDate getDueDate(){
     return dueDate;
 }
-    public String getDescription() {
-        return description;
-    }
+public String getDescription() {
+    return description;
+}
 
-    public boolean isCompleted() {
-        return Completion_status; 
-    }
-    public static boolean isDate(String in) {
-    return in.matches("\\d{4}-\\d{2}-\\d{2}");
+public boolean isCompleted() {
+    return Completion_status;
+}
+public void setCompleted() {
+    this.Completion_status = true;
+}
+public static boolean isDate(String in) {
+return in.matches("\\d{4}-\\d{2}-\\d{2}");
 }
 public static String isPriority(String priority) {
         if (priority.matches("LOW|MEDIUM|HIGH")) {
@@ -70,4 +73,5 @@ public static String isPriority(String priority) {
         }
         return this.dueDate.compareTo(other.dueDate);
     }
-    }
+    
+}

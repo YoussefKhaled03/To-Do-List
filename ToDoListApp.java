@@ -1,209 +1,300 @@
 import java.time.LocalDate;
-//import java.util.ArrayList;
-//import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class ToDoListApp {
+    private final ArrayList<Task> taskList = new ArrayList<>();
+    private final Scanner scanner = new Scanner(System.in);
 
-    private static final Scanner scanner = new Scanner(System.in);
-    private TaskList taskList = new TaskList();
+    public static void main(String[] args) {
+        ToDoListApp app = new ToDoListApp();
+        app.run();
+    }
 
-    public void start() {
+    /*private void showMainMenu() {
+        System.out.println("\u001B[36mMain Menu:\u001B[0m"); // Cyan color for main menu
+        System.out.println("1. Add Task");
+        System.out.println("2. Remove Task");
+        System.out.println("3. List Tasks");
+        System.out.println("4. Review Task");
+        System.out.println("5. Exit");
+        System.out.print("Enter your choice: ");
+    }*/
+
+    public void run() {
         while (true) {
-            System.out.println("\n--- To-Do List Menu ---");
-            System.out.println("1. Add Task");
-            System.out.println("2. Remove Task");
-            System.out.println("3. List Tasks");
-            System.out.println("4. Search Tasks");
-            System.out.println("5. Sort Tasks by Priority");
-            System.out.println("6. Sort Tasks by Due Date");
-            System.out.println("7. Mark Task as Completed");
-            System.out.println("8. Exit");
-
-            System.out.print("Choose an option: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-                case 1 -> addTask();
-                case 2 -> removeTask();
-                case 3 -> listTasks();
-                case 4 -> searchTasks();
-                case 5 -> sortTasksByPriority();
-                case 6 -> sortTasksByDueDate();
-                case 7 -> markTaskAsCompleted();
-                case 8 -> {
-                    System.out.println("Exiting To-Do List. Goodbye!");
-                    return;
-                }
-                default -> System.out.println("Invalid choice. Please try again.");
-            }
+            displayMenu();
+            int userChoice = getUserChoice();
+            handleChoice(userChoice);
+            
         }
     }
-    //add method
+
+    private void displayMenu() {
+        System.out.println("\n\u2554\u2550\u2550\u2550 \u001B[34mTo-Do List Menu\u001B[0m \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557");
+        System.out.println("\u2551 1. Add Task               \u2551");
+        System.out.println("\u2551 2. Remove Task            \u2551");
+        System.out.println("\u2551 3. List Tasks             \u2551");
+        System.out.println("\u2551 4. Review Task            \u2551");
+        System.out.println("\u2551 5. Search Tasks           \u2551");
+        System.out.println("\u2551 6. Sort Tasks by Priority \u2551");
+        System.out.println("\u2551 7. Sort Tasks by Due Date \u2551");
+        System.out.println("\u2551 8. Mark Task as Completed \u2551");
+        System.out.println("\u2551 9. Exit                   \u2551");
+        System.out.println("\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D");
+        System.out.print("Choose an option: ");
+    }
+
+    private int getUserChoice() {
+        try {
+            return Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+            return -1;
+        }
+    }
+
+    private void handleChoice(int choice) {
+        switch (choice) {
+            case 1 -> addTask();
+            case 2 -> removeTask();
+            case 3 -> listTasks();
+            case 4 -> reviewTask();
+            case 5 -> searchTasks();
+            case 6 -> sortTasksByPriority();
+            case 7 -> sortTasksByDueDate();
+            case 8 -> markTaskAsCompleted();
+            case 9 -> exitApp();
+            default -> System.out.println("\u001B[31mInvalid choice. Please try again.\u001B[0m"); // Red color for invalid choice
+        }
+    }
+
     private void addTask() {
-        //title
         System.out.print("Enter task title: ");
         String title = scanner.nextLine().trim();
         if (title.isEmpty()) {
-            System.out.println("Task title cannot be empty. Please try again.");
+            System.out.println("\u001B[31mTask title cannot be empty.\u001B[0m"); // Red color for empty title
             return;
         }
-        //description
+
         System.out.print("Enter task description: ");
         String description = scanner.nextLine().trim();
 
-        LocalDate dueDate;
-        while (true) {
-            try {
-                // year
-                System.out.print("Enter year (YYYY): ");
-                int year = Integer.parseInt(scanner.nextLine().trim());
-
-                //month
-                System.out.print("Enter month (1-12): ");
-                int month = Integer.parseInt(scanner.nextLine().trim());
-                if (month < 1 || month > 12) {
-                    System.out.println("Invalid month. Please try again.");
-                    continue;
-                }
-
-                //day
-                System.out.print("Enter day (1-31): ");
-                int day = Integer.parseInt(scanner.nextLine().trim());
-                if (day < 1 || day > 31) {
-                    System.out.println("Invalid day. Please try again.");
-                    continue;
-                }
-
-                //comparing the due date with the current date
-                dueDate = LocalDate.of(year, month, day);
-
-                if (!dueDate.isBefore(LocalDate.now())) {
-                    break;
-                } else {
-                    System.out.println("Due date cannot be in the past. Please try again.");
-                }
-            } catch (Exception e) {
-                System.out.println("Invalid input. Please try again.");
-            }
-        }
-
-        //priority
+        LocalDate dueDate = getValidDueDate();
         String priority;
         while (true) {
-            System.out.print("Enter priority\n1. LOW\n2. MEDIUM\n3.HIGH): ");
-            String input = scanner.nextLine().trim();
-            
-            if (input.equals("1")) {
-                priority = "LOW";
-                break;
-            } else if (input.equals("2")) {
-                priority = "MEDIUM";
-                break;
-            } else if (input.equals("3")) {
-                priority = "HIGH";
-                break;
+            System.out.print("Enter task priority (LOW, MEDIUM, HIGH): ");
+            priority = scanner.nextLine().trim().toUpperCase();
+            if (priority.matches("LOW|MEDIUM|HIGH")) {
+            break;
             } else {
-                System.out.println("Invalid input. Please enter 1 for LOW, 2 for MEDIUM, or 3 for HIGH.");
+            System.out.println("\u001B[31mInvalid priority. Please choose from LOW, MEDIUM, or HIGH.\u001B[0m"); // Red color for invalid priority
             }
         }
-        //creating a new task
-        Task newTask = new Task(title, description, false, dueDate, priority);
-        taskList.addTask(newTask);
-        System.out.println("Task added successfully.");
+
+        System.out.print("\u001B[33mAdding task"); // Yellow color for adding task
+        for (int i = 0; i < 3; i++) {
+            System.out.print(".");
+            try {
+                TimeUnit.MILLISECONDS.sleep(500); // Simulate loading effect
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        taskList.add(new Task(title, description, false, dueDate, priority));
+        System.out.println("\n\u001B[32mTask added successfully!\u001B[0m"); // Green color for success message
     }
 
-    //remove method
+    private LocalDate getValidDueDate() {
+        while (true) {
+            System.out.print("Enter due date (YYYY-MM-DD): ");
+            try {
+                LocalDate date = LocalDate.parse(scanner.nextLine().trim());
+                if (date.isBefore(LocalDate.now())) {
+                    System.out.println("\u001B[31mDue date cannot be in the past. Try again.\u001B[0m"); // Red color for past date
+                } else {
+                    return date;
+                }
+            } catch (Exception e) {
+                System.out.println("\u001B[31mInvalid date format. Try again.\u001B[0m"); // Red color for invalid format
+            }
+        }
+    }
+
     private void removeTask() {
-        if (taskList.getSize() == 0) {
-            System.out.println("No tasks to remove.");
-            return;
-        }
-        listTasks(); // Display the list of tasks
-        System.out.print("Enter the number of the task to remove: ");
-        int index;
+        listTasks();
+        System.out.print("Enter the task number to remove: ");
         try {
-            index = Integer.parseInt(scanner.nextLine()) - 1; // Convert input to zero-based index
+            int index = Integer.parseInt(scanner.nextLine().trim()) - 1;
+            if (index >= 0 && index < taskList.size()) {
+                taskList.remove(index);
+                System.out.println("\u001B[32mTask removed successfully.\u001B[0m"); // Green color for success message
+            } else {
+                System.out.println("\u001B[31mInvalid task number.\u001B[0m"); // Red color for invalid task number
+            }
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a valid number.");
+            System.out.println("\u001B[31mInvalid input. Please enter a number.\u001B[0m"); // Red color for invalid input
+        }
+    }
+
+    private void listTasks() {
+        if (taskList.isEmpty()) {
+            System.out.println("\u001B[31mNo tasks available.\u001B[0m"); // Red color for no tasks
             return;
         }
-    
-        if (index >= 0 && index < taskList.getSize()) {
-            taskList.removeTask(index); 
-            System.out.println("Task removed successfully!");
-            listTasks();
-        } else {
-            System.out.println("Invalid task number. Please choose a valid number from the list.");
+
+        System.out.printf("\u001B[34m%-5s %-20s %-15s %-12s %-10s%n\u001B[0m", "#", "Title", "Status", "Due Date", "Priority"); // Blue color for header
+        System.out.println("\u001B[34m-----------------------------------------------------------------\u001B[0m"); // Blue color for separator
+        for (int i = 0; i < taskList.size(); i++) {
+            Task task = taskList.get(i);
+            String priorityColor;
+            switch (task.getPriority().toLowerCase()) {
+                case "high":
+                    priorityColor = "\u001B[31m"; // Red color for high priority
+                    break;
+                case "medium":
+                    priorityColor = "\u001B[33m"; // Yellow color for medium priority
+                    break;
+                case "low":
+                    priorityColor = "\u001B[32m"; // Green color for low priority
+                    break;
+                default:
+                    priorityColor = "\u001B[0m"; // Default color
+            }
+            String statusColor = task.isCompleted() ? "\u001B[32m" : "\u001B[33m"; // Green for completed, Yellow for pending
+            System.out.printf("%-5d %-20s %s%-15s\u001B[0m %-12s %s%-10s\u001B[0m%n",
+                i + 1,
+                task.getTitle(),
+                statusColor,
+                task.isCompleted() ? "Completed" : "Pending",
+                task.getDueDate(),
+                priorityColor,
+                task.getPriority());
         }
     }
-
-    //list method
-    private void listTasks() {
-        System.out.println("\n--- Task List ---");
-        if (taskList.getSize() == 0) {
-            System.out.println("No tasks available.");
-        } else {
-            System.out.printf("%-20s %-30s %-15s %-15s %-10s%n", "Task Name", "Description", "Status", "Due Date", "Priority");
-            System.out.println("--------------------------------------------------------------------------------------------------");
-            taskList.listTasks();
-
-        }
-    }
-    
 
     private void searchTasks() {
-        System.out.print("Enter keyword to search (title, priority, or due date): ");
-        String keyword = scanner.nextLine();
+        System.out.print("Enter keyword to search: ");
+        String keyword = scanner.nextLine().trim();
 
-        Task[] matchingTasks = taskList.searchTasks(keyword);
-        if (matchingTasks.length > 0) {
-            System.out.println("\n--- Search Results ---");
-            System.out.printf("%-20s %-30s %-15s %-15s %-10s%n","Task Name", "Description", "Status", "Due Date", "Priority");
-            System.out.println("--------------------------------------------------------------------------------------------------");
-            for (Task task : matchingTasks) {
-                if (task != null) { 
-                    System.out.printf("%-20s %-30s %-15s %-15s %-10s%n", 
-                                      task.getTitle(), 
-                                      task.getDescription(), 
-                                      task.isCompleted() ? "Completed" : "Pending",
-                                      task.getDueDate() != null ? task.getDueDate().toString() : "No due date",
-                                      task.getPriority());
-                }
-            }
-        } else {
-            System.out.println("No tasks match the keyword.");
-        }
+        taskList.stream()
+            .filter(task -> task.getTitle().toLowerCase().contains(keyword.toLowerCase()) ||
+                           task.getPriority().equalsIgnoreCase(keyword))
+            .forEach(task -> System.out.printf("- %s (Priority: %s, Due: %s)%n", task.getTitle(), task.getPriority(), task.getDueDate()));
     }
 
     private void sortTasksByPriority() {
-        taskList.sortTasks((t1, t2) -> t1.getPriority().compareTo(t2.getPriority()));
+        taskList.sort(Comparator.comparing(Task::getPriority));
         System.out.println("Tasks sorted by priority.");
-        listTasks();
     }
 
     private void sortTasksByDueDate() {
-        taskList.sortTasks((t1, t2) -> t1.getDueDate().compareTo(t2.getDueDate()));
+        taskList.sort(Comparator.comparing(Task::getDueDate));
         System.out.println("Tasks sorted by due date.");
-        listTasks();
     }
 
     private void markTaskAsCompleted() {
         listTasks();
-        System.out.print("Enter the number of the task to mark as completed: ");
-        int index = scanner.nextInt() - 1;
-
-        if (index >= 0 && index < taskList.getSize()) {
-            taskList.getTask(index).markAsCompleted();
-            System.out.println("Task marked as completed!");
-        } else {
-            System.out.println("Invalid task number.");
+        System.out.print("Enter the task number to mark as completed: ");
+        try {
+            int index = Integer.parseInt(scanner.nextLine().trim()) - 1;
+            if (index >= 0 && index < taskList.size()) {
+                taskList.get(index).setCompleted();
+                System.out.println("Task marked as completed.");
+            } else {
+                System.out.println("Invalid task number.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+        }
+        System.out.print("\u001B[33mMarking task as completed"); // Yellow color for marking task
+    for (int i = 0; i < 3; i++) {
+        System.out.print(".");
+        try {
+        TimeUnit.MILLISECONDS.sleep(500); // Simulate loading effect
+        } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
         }
     }
+    System.out.println("\n\u001B[32mTask marked as completed successfully!\u001B[0m"); // Green color for success message
+    }
 
-    public static void main(String[] args) {
-        ToDoListApp app = new ToDoListApp();
-        app.start();
+    private void exitApp() {
+    System.out.print("\u001B[33mExiting the application"); // Yellow color for exiting
+    for (int i = 0; i < 3; i++) {
+        System.out.print(".");
+        try {
+        TimeUnit.MILLISECONDS.sleep(500); // Simulate loading effect
+        } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        }
+    }
+    System.out.println("\n\u001B[32mGoodbye!\u001B[0m"); // Green color for goodbye message
+    System.exit(0);
+        System.out.println("Exiting the application. Goodbye!");
+        System.exit(0);
+    }
+
+    private void reviewTask() {
+        listTasks();
+        System.out.print("Enter the task number to review: ");
+        try {
+            int index = Integer.parseInt(scanner.nextLine().trim()) - 1;
+            if (index >= 0 && index < taskList.size()) {
+                Task task = taskList.get(index);
+                System.out.println("\u001B[34mTask Details:\u001B[0m"); // Blue color for header
+                System.out.println("Title: " + task.getTitle());
+                System.out.println("Description: " + task.getDescription());
+                System.out.println("Status: " + (task.isCompleted() ? "\u001B[32mCompleted\u001B[0m" : "\u001B[33mPending\u001B[0m"));
+                System.out.println("Due Date: " + task.getDueDate());
+                System.out.println("Priority: " + task.getPriority());
+            } else {
+                System.out.println("\u001B[31mInvalid task number.\u001B[0m"); // Red color for invalid task number
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("\u001B[31mInvalid input. Please enter a number.\u001B[0m"); // Red color for invalid input
+        }
     }
 }
+/* 
+class Task {
+    private final String title;
+    private final String description;
+    private boolean isCompleted;
+    private final LocalDate dueDate;
+    private final String priority;
+
+    public Task(String title, String description, boolean isCompleted, LocalDate dueDate, String priority) {
+        this.title = title;
+        this.description = description;
+        this.isCompleted = isCompleted;
+        this.dueDate = dueDate;
+        this.priority = priority;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public boolean isCompleted() {
+        return isCompleted;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setCompleted(boolean completed) {
+        isCompleted = completed;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+}*/
